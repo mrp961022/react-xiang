@@ -303,3 +303,27 @@ ReactDOM.render(
     document.querySelector("#root")
  )
 ```
+> 另一种方式 对`reducer`中的`action`和`state`进行封装
+```
+// 对action进行一次封装
+const ActionFnObj = {
+    add:function(state,action){
+        state.num++;
+        return {...state}
+    }
+}
+// 对state的值进行初始化
+const AllStat = {
+    num: 0
+}
+function reducer(state = AllStat, action) {
+    // 判断是否为第一次进入 reducer 第一次action的type是redux版本号等内容
+    if(ActionFnObj[action.type]){
+        state = ActionFnObj[action.type](state, action)
+        return { ...state };
+    }else {
+        return { ...state };
+    }
+}
+
+```

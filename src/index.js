@@ -22,16 +22,23 @@ class Counter extends React.Component{
 const addAction = {
     type: "add"
 }
-function reducer(state={ num:0 },action) {
-    switch (action.type) {
-        case 'add':
-            state.num++
-            break;
-    
-        default:
-            break;
+const ActionFnObj = {
+    add:function(state,action){
+        state.num++;
+        return {...state}
     }
-    return { ...state };
+}
+const AllStat = {
+    num: 0
+}
+function reducer(state=AllStat,action) {
+    // 判断是否为第一次进入 reducer 第一次action的type是redux版本号等内容
+    if(ActionFnObj[action.type]){
+        state = ActionFnObj[action.type](state, action)
+        return { ...state };
+    }else {
+        return { ...state };
+    }
 }
 const store = createStore(reducer);
 // 定义一个将状态映射到props上的一个函数
