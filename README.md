@@ -327,3 +327,7 @@ function reducer(state = StateObj, action) {
 }
 
 ```
+
+## ui库的使用 例如ant design
+* 安装`antd`和`babel-plugin-import `
+* 暴露配置 `eject` `npm run eject -y`
