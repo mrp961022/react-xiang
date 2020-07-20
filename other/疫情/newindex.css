@@ -1,0 +1,28 @@
+.content {
+    width: 400px;
+    height: 400px;
+    background-color: skyblue;
+    display: none;
+}
+.active {
+    display: block;
+}
+#chartmap {
+    height: 750px;
+}
+h1 {
+    text-align: center;
+}
+ul,li {
+    list-style: none;
+}
+li {
+    display: flex;
+}
+span {
+    flex: 1;
+}
+li:nth-child(odd) {
+    /* 奇数选择器 */
+    background-color: gainsboro;
+}
