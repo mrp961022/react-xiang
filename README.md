@@ -330,4 +330,11 @@ function reducer(state = StateObj, action) {
 
 ## ui库的使用 例如ant design
 * 安装`antd`和`babel-plugin-import `
-* 暴露配置 `eject` `npm run eject -y`
+* 暴露配置 `eject` `npm run eject -y` 注意如果配置了git但是有内容没有提交到git 无法进行该操作 要先提交
+* 配置`babel` 在`package.json`中找到`babel` 然后在里面`presets`同级增加 此时就不需要加载样式文件
+```
+"plugins": [
+      ["import", { "libraryName": "antd", "style": "css" }] 
+    ]
+```
+* 引入需要使用的组件 例如`button`等 直接使用
