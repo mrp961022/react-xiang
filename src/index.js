@@ -28,10 +28,10 @@ const ActionFnObj = {
         return {...state}
     }
 }
-const AllStat = {
+const StateObj = {
     num: 0
 }
-function reducer(state=AllStat,action) {
+function reducer(state=StateObj,action) {
     // 判断是否为第一次进入 reducer 第一次action的type是redux版本号等内容
     if(ActionFnObj[action.type]){
         state = ActionFnObj[action.type](state, action)
