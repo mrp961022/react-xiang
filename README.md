@@ -337,4 +337,28 @@ function reducer(state = StateObj, action) {
       ["import", { "libraryName": "antd", "style": "css" }] 
     ]
 ```
-* 引入需要使用的组件 例如`button`等 直接使用
+* 引入需要使用的组件 例如`Button`等 直接使用
+
+## 使用`express`模拟接口
+* `npm init`生成`package.json`文件
+* 安装`express`依赖 建议使用`cnpm`或者`yarn` `yarn add express --save` 安装`axios`依赖
+* 新建`index.js` 内容如下
+```
+const express = require("express");
+const axios = require("axios")
+const app = express();
+app.get('/api/newsdata', async (req,res)=>{
+    // 解决ajax跨域
+    res.append('Access-Control-Allow-Origin', "*");
+    res.append('Access-Control-Allow-content-type', "*")
+    // 请求头条数据
+    let result = await axios.get("https://c.m.163.com/ug/api/wuhan/app/data/list-total?t=318929278640")
+    let data = result.data;
+    res.send(data);
+    res.json({ name: "老马" })
+})
+app.listen(8080, ()=>{
+    console.log("http://localhost:8080/api/newsdata");
+})
+```
+* `node`切换到这个目录 执行`node index.js`
