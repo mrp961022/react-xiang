@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
+import { List } from 'antd-mobile'
 import fns from '../store/asyncMethods'
+const Item = List.Item;
+const Brief = Item.Brief
 class Location extends Component {
     constructor(props) {
         super(props);
@@ -10,13 +13,24 @@ class Location extends Component {
     }
     render() {
         const {allData,getTimu} = this.props
-        console.log(allData)
         return (
             <div>
                 <button onClick={getTimu}>点击</button>
                 <h1>题目：{'题目'}</h1>
                 <div className="options">
-                    {'题目列表'}
+                    { allData.map((item,index)=>{
+                        return (
+                            <List renderHeader={() => '该地市的经纬度'} key={index} className="latlon-list" style={{backgroundColor:`rgba(${item.color})`}}>
+                                { item.latAndLong.map((childItem,childIndex)=>{
+                                    return (
+                                        <Item key={childIndex}>
+                                           <Brief>经纬度：</Brief> {childItem.join(' ')}
+                                        </Item>
+                                    )
+                                }) }
+                            </List>
+                        )
+                    }) }
                 </div>
             </div>
         );
@@ -36,7 +50,7 @@ function mapDispatchToProps(dispatch) {
     return {
         onAddClick: ()=>{ dispatch(addAction) },
         getTimu:async ()=>{ 
-            let list = await fns.getAsyncData(0,1)
+            let list = await fns.getAsyncData()
             dispatch({type: "setTimu",content: list})
         }
     }
