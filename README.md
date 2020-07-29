@@ -367,19 +367,210 @@ app.listen(8080, ()=>{
 > 增强函数组件的功能 在没有hook的时候: 没有状态 没有生命周期 没有引用
 > 在hook里的提供的方法都是use开头的
 
-* `useState` 将函数组件的普通变量声明称react的state状态
+### `useState` 将函数组件的普通变量声明称react的state状态
 ```
 // 初始化状态和修改状态的方法
 const [a,setA] = useState(0); // 给a赋值0
 // 使用和修改
 {a} // 直接使用
 setA(a+1) // 修改
+// setA仍然是异步的 如果想取到改变后的数据
+setA(()=>{
+    console.log(a+1);
+    return a+1;
+})
 ```
 
-* `useRef` hook中的ref
+### `useRef` hook中的ref
 ```
 // 初始化ref  
 const p1 = useRef();
 // 使用ref
 p1.current.style.background="red"
+```
+
+### `useEffect` 生命周期方法
+* 相当于componentDidMount、componentDidUpdate 和 componentWillUnmount 三个状态
+* 副作用 （DOM操作 数据请求 组件更新）
+* useEffect在组件函数内部执行 可以获取state和props 采用闭包的形式
+* 无阻塞更新
+* useEffect(回调函数, 数组（可不写）) 两个参数 第二个参数控制在状态改变时监听那个状态 例子 
+```
+// 只监听obj这个状态 
+useEffect(()=>{
+    console.log(obj)
+}, [obj])
+```
+* 可以写多个useEffect()
+
+### 父子组件传值 `createContext` `useContext`
+* 父组件 
+```
+import { createContext } from 'react';
+export default createContext();
+```
+* 子组件
+```
+import React, {useContext} from 'react'
+import MyContent from './MyContent' // 父组件
+export default ()=>{
+    let count = useContext(MyContent);
+    return (
+        <h3>
+            {count}
+        </h3>
+    )
+}
+```
+* 使用
+```
+import MyContent from './component/MyContent' // 父组件
+import ChildContext from './component/ChildContext' // 子组件
+<MyContent.Provider value={a}>
+    <ChildContext/>
+</MyContent.Provider>
+```
+
+### `useMemo` 生命周期
+* 相当于 `shouldComponentUpdate` 类似作用 在渲染过程中避免重复渲染的问题 当状态或者父组件传来的属性发生改变时 更新组件
+* `useMemo` 用的是`Memoization`来提高性能的
+* `Memoization` 是`javascript`的缓存技术
+* 如果我们有CPU密集型操作 我们可以通过将初始操作的结果缓存在缓存中来优化使用 如果操作必然会再次执行 我们不再麻烦两次使用我们的CPU 因为相同的结果存储在某个地方 我们只是简单的返回结果 这个是以空间换速度 所以最好确定你是否值得这么做 有些场景很有必要使用 
+* `useMemo()` 是一个函数 两个参数 第一个是函数 第二个是数组
+* `useMemo(()=>{}, [可以不写])` 参数类似`useEffect` 如果第二个参数和`useEffect`一样的话 会在 `useEffect` 之前执行
+> 使用方式
+```
+let res = useMemo(()=>{
+    return {count, num}; // 监控改变的状态
+},[count]) // 通过第二个参数控制哪个状态改变时页面组件更新 如果是空数组就不会改变 如果没有默认是所有状态
+// 例如
+<h3>count{res.count}----num{res.num}</h3>
+<button onClick={()=>{
+    setCount(count+1)
+}}>改变count</button> {/* 点击这个按钮 组件会更新 */}
+<button onClick={()=>{
+    setNum(num+1)
+}}>改变num</button> {/* 点击这个按钮 状态会改变但是组件不会更新 */}
+```
+
+### `useCallback` 避免组件重复渲染 提高性能(useMemo)
+* 控制组件什么时候更新
+* 同样用到缓存计数 和`useMemo`不同的是 `useCallback` 是一个函数 是个函数就可以执行 
+* `useCallback()` 有两个参数 第一个参数是函数 第二个是数组
+* `const callback = useCallback(()=>{},[])`;
+* 可以直接`callBack()`执行
+> 使用方式 
+```
+const [count, setCount] = useState(0)
+let callback = useCallback(()=>{
+    console.log(count);
+    return count;
+},[count]) // 最好写第二个参数 不然调用的时候会一直不改变
+<h3>{callback()}</h3>{/* 使用时直接执行方法 */}
+```
+
+### `useImperativeHandle`
+* 可以让你在使用`ref`时自定义暴露给父组件的实例值 在大多数情况下 应当避免使用`ref`这样的命令代码 `useImperativeHandle` 应当与 `forwardRef` 一起
+#### `forwardRef` 使用方式
+```
+import React, { forwardRef, useRef } from 'react';
+const Forward = forwardRef((props, ref)=>{
+    return (
+        <>
+        {/* ref 传递到子组件上 */}
+        <h3 ref={ref}>123</h3>
+        <h4>456</h4>
+        </>
+    )
+})
+export default (()=>{
+    const h3El = useRef(null);
+    return (
+        <>
+        <Forward ref={h3El}/>
+        <button onClick={()=>{
+            // 父组件直接使用heEl即可 就是上面哪个h3 
+            // 在这里还有一层current
+            console.log(h3El)
+        }}>获取子组件dom</button>
+        </>
+    )
+});
+```
+### `useImperativeHandle(ref(传递来的), ()=>{}, [])`
+```
+// 第一个参数 ref 
+// 第二个参数 函数的return 暴露给父组件的属性还有方法
+// 第三个参数 监控哪个状态改变时重新传入ref 如果不写 任何状态改变都会传入 最好第二个参数return有的状态在第三个参数中都有
+```
+### `useLayoutEffect` 和 `useEffect` 作用一样 在组件生成过程中可以做一些操作
+
+> 不同点 
+```
+1. 执行时间不同 useEffect 在componentDidMount后执行 useLayoutEffect 在浏览器执行绘制之前执行（会阻塞组件挂载 慎用）useLayoutEffect 会在 useEffect 之前执行
+```
+### `useReducer` 可以和`useContext`结合 实现和redux类似的作用
+* 和redux中的reducer一样 reducer就是一个函数
+* `useReducer()` 是一个函数 第一个参数reducer 第二个参数初始值 第三个参数init
+* `uerReducer()` 返回值是个数组 第一个是state 第二个是dispatch
+* `const [state, dispatch] = useReducer(reducer,初始值)`
+> `useReducer`和`useContext`结合 实现和redux类似的作用
+```
+// 定义reducer和context
+import React, { createContext, useReducer } from 'react';
+
+// reducer和context实现redux类似功能
+export const MyCountext = createContext();
+// reducer 修改状态的方法
+const reducer = (state, action) => {
+    {/* 通过action的type不同执行不同操作 */}
+    ... 
+}
+// state 状态值
+const data = {name:"zhangsan", age:19}
+
+export const Reducer =  (props) => {
+    let [state, dispatch] = useReducer(reducer, data)
+    return (
+        <MyCountext.Provider value={{state, dispatch}}>
+            {props.children}
+        </MyCountext.Provider>
+    )
+}
+// 使用reducer
+import { MyCountext } from './Reducer'
+let {state, dispatch} = useContext(MyCountext)
+// 属性 {state.name}
+// 修改state的方法 dispatch({type:"***", 其他属性})
+```
+
+
+
+## 自定义hook
+> 自定义hook 和普通函数没有区别 都是一些函数的封装 方便使用 注意
+* 自定义hook 必须以use开头
+* 自定义hook 可以使用普通hook(useState, useEffect......)来封装
+
+```
+import React,{useState} from 'react';
+// 自定义hook
+const useCus = (val, num) => {
+    let [count,setCount] = useState(val);
+    const add = () => {
+        setCount(count+num)
+    }
+    return {count,add}
+}
+
+export default ()=>{
+    let {count,add} = useCus(10,2)
+    return (
+        <>
+        <h1>{count}</h1>
+        <button onClick={()=>{
+            add();
+        }} >加2</button>
+        </>
+    )
+}
 ```
