@@ -362,3 +362,24 @@ app.listen(8080, ()=>{
 })
 ```
 * `node`切换到这个目录 执行`node index.js`
+
+## react hook 可以提供大部分类组件的功能 也可以自定义hook
+> 增强函数组件的功能 在没有hook的时候: 没有状态 没有生命周期 没有引用
+> 在hook里的提供的方法都是use开头的
+
+* `useState` 将函数组件的普通变量声明称react的state状态
+```
+// 初始化状态和修改状态的方法
+const [a,setA] = useState(0); // 给a赋值0
+// 使用和修改
+{a} // 直接使用
+setA(a+1) // 修改
+```
+
+* `useRef` hook中的ref
+```
+// 初始化ref  
+const p1 = useRef();
+// 使用ref
+p1.current.style.background="red"
+```
