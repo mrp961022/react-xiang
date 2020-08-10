@@ -4,5 +4,11 @@ export default {
             ...state,
             name:action.name
         }
+    },
+    setage(state, action){
+        return {
+            ...state,
+            age: action.age
+        }
     }
 }

@@ -84,6 +84,10 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 * ComponentDidUpdate: 组件更新完毕
 * ComponentWillUnmount: 组件将要卸载
 
+## react 父子组件传值
+> props 传值 变量方法都可以
+* 普通变量 只需要在子组件上增加属性 例如 `age = {this.state.age}` 子组件中只需要在props中取指定属性即可
+* 方法 父组件直接传递方法 子组件使用用方法需要注意 如果没有传参直接在指定位置绑定方法即可 如果有传参 需要改成箭头函数 例如 `onClick = { () => { add(111) } }`
 
 ## react中的插槽
 > 组件中写入内容 这些内容可以被识别和控制 `react`中需要自己开发支持插槽 组件中写入的HTML 可以传入到`props`中 在`props`中的`childern`中
@@ -369,7 +373,7 @@ app.listen(8080, ()=>{
 
 ### `useState` 将函数组件的普通变量声明称react的state状态
 ```
-// 初始化状态和修改状态的方法
+// 初始化状态和修改状态的方法 注意命名 一定要是set跟上变量名 首字母小写驼峰命名
 const [a,setA] = useState(0); // 给a赋值0
 // 使用和修改
 {a} // 直接使用
@@ -573,4 +577,42 @@ export default ()=>{
         </>
     )
 }
+```
+
+## es2020 新特性 
+* `globalThis` 全局变量 相当于 `window`
+```
+三种全局变量
+window 只能在浏览器中生效
+self 在浏览器和webworker中生效
+globalThis 浏览器webworker以及node中可以使用
+```
+* `Promise.allSettled` 多个promise并发执行
+```
+let p1 = new Promise((resove, reject)=>setTimeout(resolve(1),200));
+let p2 = new Promise((resove, reject)=>setTimeout(reject('error'),300));
+let p3 = new Promise((resove, reject)=>setTimeout(resolve(2),400));
+// 以前并发执行 参数中任何一个promise为reject则整个promise.all会终止
+Promise.all([p1,p2,p3]).then(res=>console.log(res)).catch(e=>console.log(e));
+// Promise.allSettled 结果会依次打印出来
+Promise.allSettled([p1,p2,p3]).then(res=>console.log(res)).catch(e=>console.log(e));
+```
+
+* 空位合并操作符 `??` 可选链操作符 `?`
+```
+let Libra = {
+    info:{
+        name: 'Libra',
+        money: 100
+    }
+}
+Libra.info.money ?? 100; // 可以替代逻辑或 而且当money为0的时候不会取100 只有money为undefined时才会取100
+Libra.info.money; // 常规写法这样写如果没有info属性语句会报错
+Libra?.info?.money; // 使用可选链操作符不会报错 会是undefined
+```
+
+* `BigInt` 最大值
+```
+在js中又一个最大值 Number.MAX_SAFE_INTEGER
+当需要使用更大的值时可以在普通数值后面拼接一个 n 也可以使用BigInt(num)将普通数值转换为BigInt
 ```
